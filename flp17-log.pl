@@ -22,8 +22,38 @@ assert_rule([State, _, Symbol, _, NewState, _, NewSymbol]) :-
 % @param Symbol - current symbol on the tape
 % @param TapeTail - rest of the tape
 run(State, [TapeHead, Symbol, TapeTail]) :-
-    rule(State, Symbol, NewState, NewSymbol),
-    write_status(TapeHead, State, Symbol, TapeTail).
+    % check if we are in final state
+    ( State='F' ->
+        write_status(TapeHead, State, Symbol, TapeTail);
+        (
+            % check if there is a rule that will end the calculation
+            rule(State, Symbol, 'F', NewSymbol) ->
+                rule(State, Symbol, 'F', NewSymbol);
+                rule(State, Symbol, NewState, NewSymbol)
+        ),
+        write_status(TapeHead, State, Symbol, TapeTail),
+        update_tape(NewSymbol, [TapeHead, Symbol, TapeTail], NewTape),
+        run(NewState, NewTape)
+    ).
+
+% update_tape updates given tape based on the given tape and a symbol
+% of a given rule L, R or new symbol
+update_tape(NewSymbol, [TapeHead, Symbol, TapeTail], Tape) :-
+    (NewSymbol='L' ->
+        % move to the left on the tape
+        ;
+        (NewSymbol='R' ->
+            % move to the right
+            first(TapeTail, NewTapeSymbol), % get current symbol out of the tape
+            append([Symbol], TapeHead, NewTapeHead), % create new tape head
+            tail(TapeTail, NewTapeTail),
+            construct_tape(NewTapeHead, NewTapeSymbol, NewTapeTail, Tape);
+            % change symbol on the tape
+            construct_tape(TapeHead, NewSymbol, TapeTail, Tape))
+    ).
+
+% construct_tape is a helper that creates a tape from the given symbols
+construct_tape(Head, Symbol, Tail, [Head, Symbol, Tail]).
 
 % main is an entry point to the program
 main :-
@@ -39,6 +69,11 @@ main :-
 % first is a helper function that returns first element of the list
 first([X], X).
 first([X|_], X).
+
+% last returns last element of the list
+last([], []).
+last([X], X).
+last([_| T], X) :- last(T, X).
 
 % tail is a wrapper function for [_ | T]
 tail([], []).

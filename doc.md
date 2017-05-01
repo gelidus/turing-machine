@@ -12,7 +12,7 @@ on the final state.
 The project is implemented using swi-prolog and uses `make` for orchestration.
 The application first loads given rules and tape from `stdin`. Rules are then
 constructed as a Prolog facts. These facts are then iterated using function
-`run(Tape)`. 
+`run`. Every match is written into stdout as a current configuration.
 
 ## Experiments
 
