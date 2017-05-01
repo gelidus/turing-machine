@@ -14,6 +14,20 @@ The application first loads given rules and tape from `stdin`. Rules are then
 constructed as a Prolog facts. These facts are then iterated using function
 `run`. Every match is written into stdout as a current configuration.
 
+The tape is divided into three parts: Head, Current Symbol and Tail. Lists are
+then enlarged or shrinked based on the movement (Left and Right rules) of the
+machine.
+
+Each time the machine can decide between going to final state `F` or other state,
+the machine chooses the final state.
+
 ## Experiments
 
+All experiments were measured using `time` utility, respectively `sys` time.
+
+- `tests/1.txt` took 0.003s (tape size: 6, rules: 5)
+- `tests/2.txt` took 0.004s (tape size: 246, rules: 5)
+
 ## Conclusion
+The core of the implementation is really small (~20LOC), however, many helper
+functions were implemented to make the abstraction for a reader clear.

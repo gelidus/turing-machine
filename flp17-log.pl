@@ -41,7 +41,10 @@ run(State, [TapeHead, Symbol, TapeTail]) :-
 update_tape(NewSymbol, [TapeHead, Symbol, TapeTail], Tape) :-
     (NewSymbol='L' ->
         % move to the left on the tape
-        ;
+        last(TapeHead, NewTapeSymbol),
+        all_but_last(TapeHead, NewTapeHead),
+        append(TapeHead, [Symbol], NewTapeTail),
+        construct_tape(NewTapeHead, NewTapeSymbol, NewTapeTail, Tape);
         (NewSymbol='R' ->
             % move to the right
             first(TapeTail, NewTapeSymbol), % get current symbol out of the tape
@@ -74,6 +77,11 @@ first([X|_], X).
 last([], []).
 last([X], X).
 last([_| T], X) :- last(T, X).
+
+% all_but_last slices the list, removing the last element
+all_but_last([_], []).
+all_but_last([H|T], [H|Tail]) :-
+    all_but_last(T, Tail).
 
 % tail is a wrapper function for [_ | T]
 tail([], []).
